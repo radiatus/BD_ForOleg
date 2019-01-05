@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<style>
+   body {
+    background: #666666; /* Цвет фона */
+    color: #FFFFFF; /* Цвет текста */
+   }
+   .table1{
+        margin: auto;
+        align: center;
+        border-spacing: 0px 1px;
+        color: #FFFFFF;
+   }
+   .innerTable{
+        border-collapse: collapse;
+        border: 1px solid black;
+        align: center;
+        border-spacing: 5px 5px;
+   }
+   .innerCell{
+        border: 1px solid black;
+        width: 170px;
+   }
+   .cell{
+        border: 1px solid black;
+        width: 170;
+   }
+   .empty{
+        border: 0px solid black;
+        width: 170;
+   }
+   .textBox{
+        width: 98%;
+   }
+</style>
+
+<html lang="en">
+<head align="center">
+    <meta charset="UTF-8">
+    <title>View DB</title>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body align="center">
+
+<form align="center">
+    <p align="center"><strong>Выбери Таблицу</strong></p>
+    <p align="center"><select id ="{{filename}}" onchange="ChangeTable(this)">
+    {% for name in table_view.table_names %}
+        {%if name != 'sqlite_sequence'%}
+        <option value="{{name}}">{{name}}</option>
+        {% endif %}
+    {% endfor %}
+    </select>
+    </p>
+    <p align="center"><input type="button" value="Скачать БД" onClick='location.href="http://127.0.0.1:5000/download/{{filename}}"'>
+</form>
+
+</td></tr>
+
+<tr align="center"><td>
+    <div id ="result"></div>
+
+</td></tr></table>
+
+<script align="center">
+
+function ChangeTable(selectObject) {
+    var value = selectObject.value;
+    var filename = selectObject.id;
+    urll = 'http://127.0.0.1:5000/show_db/' + filename;
+
+    $.post( urll, {name: value} ).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+}
+
+function pushButtonSave(selectObject) {
+    var value = selectObject.value;
+    var filename = selectObject.id;
+    urll = 'http://127.0.0.1:5000/download/' + filename;
+
+    $.post( urll, {name: value} ).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+}
+</script>
+
+
+</body>
+</html>

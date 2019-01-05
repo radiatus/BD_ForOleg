@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<style>
+   body {
+    background: #666666; /* Цвет фона */
+    color: #FFFFFF; /* Цвет текста */
+   }
+   .table1{
+        margin: auto;
+        align: center;
+        border-spacing: 0px 1px;
+        color: #FFFFFF;
+   }
+   .innerTable{
+        border-collapse: collapse;
+        border: 1px solid black;
+        align: center;
+        border-spacing: 5px 5px;
+   }
+   .innerCell{
+        border: 1px solid black;
+        width: 170px;
+   }
+   .cell{
+        border: 1px solid black;
+        width: 170;
+   }
+   .empty{
+        border: 0px solid black;
+        width: 170;
+   }
+   .textBox{
+        width: 98%;
+   }
+</style>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Data Base</title>
+</head>
+
+    <form method="post" action="/create_data_base/">
+        <input type="hidden" name="db_name" value="{{db_name}}">
+        <input type = "submit" name = "button" value = "submit">
+    </form>
+
+    <form method="post" action="/">
+        <input type="hidden" name="db_name" value="{{db_name}}">
+        <input type = "submit" name = "download" value = "download">
+    </form>
+
+    {% for table_name in DB.keys() %}
+        <h2 align = "center">{{ table_name }}</h2>
+
+        <table border = 2  align = "center" bordercolor = "gray">
+
+            <tr> <!--  Заголовок  -->
+            {% for name in DB[table_name].headline_names %}
+                <td>
+                    <form action="/change_name/" method="POST">
+                        <input type="hidden" name="db_name" value="{{db_name}}">
+                        <input type="hidden" name="table_name" value="{{table_name}}">
+                        <input type="hidden" name="loop_index" value="{{loop.index0}}">
+                        <input type="text" name="value" value="{{name}}">
+                    </form>
+                </td>
+            {% endfor %}
+                <td>
+                <form action="/add_col/" method="POST">
+                    <input type="hidden" name="db_name" value="{{db_name}}">
+                    <input type="hidden" name="table_name" value="{{table_name}}">
+                    <input type="submit" name="button_add_col" value="add col">
+                </form>
+                </td>
+            </tr>   <!-- **** -->
+
+            <tr>    <!-- Тип -->
+
+            <form action="/set_types/" method="POST">
+                <input type="hidden" name="db_name" value="{{db_name}}">
+                <input type="hidden" name="table_name" value="{{table_name}}">
+                {% for name in DB[table_name].headline_names %}
+                <td>
+                    {% if DB[table_name].headline_types[loop.index0] == "INTEGER" %}
+                        <input type="radio" name="type{{loop.index0}}" value="INTEGER" checked> int <br>
+                        <input type="radio" name="type{{loop.index0}}" value="real"> real <br>
+                        <input type="radio" name="type{{loop.index0}}" value="text"> text <br>
+                    {% elif DB[table_name].headline_types[loop.index0] == "real" %}
+                        <input type="radio" name="type{{loop.index0}}" value="INTEGER"> int <br>
+                        <input type="radio" name="type{{loop.index0}}" value="real" checked> real <br>
+                        <input type="radio" name="type{{loop.index0}}" value="text"> text <br>
+                    {% else %}
+                        <input type="radio" name="type{{loop.index0}}" value="INTEGER"> int <br>
+                        <input type="radio" name="type{{loop.index0}}" value="real"> real <br>
+                        <input type="radio" name="type{{loop.index0}}" value="text" checked> text <br>
+                    {% endif %}
+
+                </td>
+                {% endfor %}
+                <td>
+                    <input type="submit" name="button_set_types" value="apply">
+                </td>
+                </form>
+            </tr>
+
+            <tr>    <!-- Ограничения -->
+
+            <form action="/set_cons/" method="POST">
+                <input type="hidden" name="db_name" value="{{ db_name }}">
+                <input type="hidden" name="table_name" value="{{ table_name }}">
+                {% for name in DB[table_name].headline_names %}
+                <td>
+                    <input type="hidden" name="db_name" value="{{ db_name }}">
+                    <input type="hidden" name="table_name" value="{{ table_name }}">
+
+                    <input type="text" name="foreign key{{loop.index0}}" value="{{DB[table_name].headline_foreign_key[loop.index0]}}"> foreign key <br>
+
+                    <!--{% if "foreign key" in DB[table_name].headline_cons[loop.index0]%}
+                        <input type="" name="foreign key{{loop.index0}}" value=" {{ DB[table_name].headline_foreign_key[] }}"> foreign key <br>
+                    {% else %}
+                        <input type="checkbox" name="foreign key{{loop.index0}}" value="foreign key"> foreign key <br>
+                    {% endif %} -->
+
+                    {% if "primary key" in DB[table_name].headline_cons[loop.index0]%}
+                        <input type="checkbox" name="primary key{{loop.index0}}" value="primary key" checked> primary key <br>
+                    {% else %}
+                        <input type="checkbox" name="primary key{{loop.index0}}" value="primary key"> primary key <br>
+                    {% endif %}
+
+                    {% if "unique" in DB[table_name].headline_cons[loop.index0]%}
+                        <input type="checkbox" name="unique{{loop.index0}}" value="unique" checked> unique <br>
+                    {% else %}
+                        <input type="checkbox" name="unique{{loop.index0}}" value="unique"> unique <br>
+                    {% endif %}
+
+                    {% if "AUTOINCREMENT" in DB[table_name].headline_cons[loop.index0]%}
+                        <input type="checkbox" name="AUTOINCREMENT{{loop.index0}}" value="AUTOINCREMENT" checked> auto increment <br>
+                    {% else %}
+                        <input type="checkbox" name="AUTOINCREMENT{{loop.index0}}" value="AUTOINCREMENT"> auto increment <br>
+                    {% endif %}
+
+                    {% if "not null" in DB[table_name].headline_cons[loop.index0]%}
+                        <input type="checkbox" name="not null{{loop.index0}}" value="not null" checked> not null <br>
+                    {% else %}
+                        <input type="checkbox" name="not null{{loop.index0}}" value="not null"> not null <br>
+                    {% endif %}
+
+                </td>
+                {% endfor %}
+                <td>
+                    <input type="submit" name="button_set_cons" value="apply">
+                </td>
+                </form>
+            </tr>
+
+        </table>
+
+    {% endfor %}
+
+<body>
+
+</body>
+</html>

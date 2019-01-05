@@ -1,0 +1,148 @@
+<style>
+   body {
+    background: #666666; /* Цвет фона */
+    color: #FFFFFF; /* Цвет текста */
+   }
+   .table1{
+        margin: auto;
+        align: center;
+        border-spacing: 0px 1px;
+        color: #FFFFFF;
+   }
+   .innerTable{
+        border-collapse: collapse;
+        border: 1px solid black;
+        align: center;
+        border-spacing: 5px 5px;
+   }
+   .innerCell{
+        border: 1px solid black;
+        width: 170px;
+   }
+   .cell{
+        border: 1px solid black;
+        width: 170;
+   }
+   .empty{
+        border: 0px solid black;
+        width: 170;
+   }
+   .textBox{
+        width: 98%;
+   }
+</style>
+<table class="table1" cellpadding="0" cellspacing="0"><tr><td>
+
+<!-- НАЗВАНИЯ -->
+
+<table class="innerTable" bordercolor = "gray">
+
+<tr>{% for name in table_view.headline_names[tablename] %}
+    <td class="innerCell"><div class="textbox"><b> {{ name }}</b></div></td>
+    {% endfor %}
+</tr>
+</table>
+</td></tr><tr><td>
+
+<!-- ПОЛЯ action="/add_row/{{filename}}"-->
+
+<form method="post" id ="addform" >
+<table class="innerTable" bordercolor = "gray">
+<tr>
+    {% for name in table_view.headline_names[tablename] %}
+
+        <td class="innerCell"><b>
+            <input type="hidden" name="name{{loop.index0}}" value="{{name}}">
+            {%if not search_val is defined %}
+            <input class="textBox" type="text" name="{{name}}" value="">
+            {%else%}
+            <input class="textBox" type="text" name="{{name}}" value="{{search_val[loop.index0]}}">
+            {%endif%}
+        </b></td>
+
+    {% endfor %}
+
+    <td class="innerCell" >
+        <input type = "hidden" name="table_name" value="{{tablename}}">
+        <input type = "button" onclick="pushButtonAdd('{{filename}}')" name = "add" value = "Добавить">
+        <input type = "button" onclick="pushButtonFind('{{filename}}')" name = "find" value = "Найти">
+        <input type = "button" onclick="pushButtonShowAll('{{filename}}')" name = "show_all" value = "Сброс">
+    </td>
+
+</tr>
+</table>
+</form>
+
+<!-- СТРОКИ -->
+{% for row in rows %}
+</td></tr><tr><td>
+<form method="post" action="/showdb/{{filename}}" id ="delform{{loop.index0}}">
+{% set index = loop.index0%}
+<table class="innerTable" bordercolor = "gray"> <tr>
+    {% for cell in row %}
+        <td class="innerCell">
+            <input class="textBox" type="text" name="cell_new{{loop.index0}}" value="{{cell}}">
+            <input type="hidden" name="cell_old{{loop.index0}}" value="{{cell}}">
+        </td>
+    {% endfor %}
+        <td class="innerCell">
+            <input type = "hidden" name="table_name" value="{{tablename}}">
+            <input type = "button" onclick="pushButtonDelete('{{filename}}', {{index}})" name = "delete" value = "Удалить">
+        </td>
+</tr></table>
+</form>
+
+{% endfor %}
+
+</td></tr><tr><td>
+<script>
+
+function pushButtonSave(filename) {
+    urll = 'http://127.0.0.1:5000/download/' + filename;
+        $.post(urll, $('#addform').serialize()).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+};
+
+function pushButtonShowAll(filename) {
+    urll = 'http://127.0.0.1:5000/show_all_row/' + filename;
+        $.post(urll, $('#addform').serialize()).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+};
+
+function pushButtonAdd(filename) {
+    urll = 'http://127.0.0.1:5000/add_row/' + filename;
+
+    $.post(urll, $('#addform').serialize()).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+};
+
+function pushButtonFind(filename) {
+    urll = 'http://127.0.0.1:5000/find_row/' + filename;
+
+    $.post(urll, $('#addform').serialize()).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+};
+
+function pushButtonDelete(filename, index) {
+    urll = 'http://127.0.0.1:5000/del_row/' + filename;
+    form_name = '#delform' + index
+    $.post(urll, $(form_name).serialize()).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+};
+
+function pushButtonChange(filename, index) {
+    urll = 'http://127.0.0.1:5000/change_row/' + filename;
+    form_name = '#delform' + index
+    $.post(urll, $(form_name).serialize() + "&" + $(addform).serialize()).done(function( data ) {
+        $( "#result" ).empty().append( data );
+    });
+};
+
+</script>
+
+</td></tr></table>

@@ -1,0 +1,8 @@
+    $.ajax({
+        type: 'POST',
+        url: urll,
+        data: 'tablename=value',
+        success: function(data) {
+        $('.results').html(data);
+        }
+    });
